@@ -10,9 +10,11 @@ If an emergency is identified, the system triggers an alert process. It captures
 <img width="919" height="486" alt="image" src="https://github.com/user-attachments/assets/98cb7e65-3bac-48b3-9b47-fed25c9c805a" />
 
 After processing, the system displays an alert message on an LCD screen and activates a buzzer to provide an immediate local warning. Finally, it sends notifications to the user or relevant authorities, ensuring timely response. Once the alert is delivered, the process ends or resets for continuous monitoring.
+# Energy Division
 
-#Energy Division
 <img width="844" height="337" alt="image" src="https://github.com/user-attachments/assets/7f4e710d-adf3-47be-89c0-d065b50a4632" />
+                                               
                                                Table:1 Transmitter circuit energy division
 <img width="908" height="214" alt="image" src="https://github.com/user-attachments/assets/4b6d4285-bfcb-4850-8fab-dddf0f1dca5d" />
+                                             
                                                Table:2 Receiver Circuit energy division

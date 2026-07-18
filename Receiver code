@@ -1,0 +1,310 @@
+#include <LiquidCrystal.h>
+#include <stdio.h>
+LiquidCrystal lcd(13, 12, 14, 27, 26, 25);
+#include <WiFi.h>
+#include <HTTPClient.h>
+HTTPClient http;
+const char *ssid = "iotserver";
+const char *password = "iotserver123";
+int httpResponseCode;
+String servername = "http://projectsfactoryserver.in/storedata.php?name=";
+String accountname = "iot1824";
+String field1 = "&lat=";
+String field2 = "&lan=";
+String field3 = "&s1=";
+String field4 = "&s2=";
+String field5 = "&s3=";
+String field6 = "&s4=";
+String field7 = "&s5=";
+String field8 = "&s6=";
+String payload="";
+int tempc=0;
+#define RXD2 16
+#define TXD2 17
+int buzzer  = 23;
+int i=0,k=0,lop=0;
+int  gps_status=0;
+float latitude=0; 
+float logitude=0;                       
+String Speed="";
+String gpsString="";
+char *test="$GPRMC";
+//int hbtc=0,hbtc1=0,rtrl=0;
+unsigned char gv=0,msg1[10],msg2[11];
+ float lati=0,longi=0;
+unsigned int lati1=0,longi1=0;
+unsigned char flat[5],flong[5];
+char finallat[10]="17.8892\0",finallong[10]="079.6002\0";
+//17.541003, 78.474351
+String finallat1="";
+String finallong1="";
+int ii=0,rchkr=0;
+String lat_string="",long_string="";
+String hb_string="";
+String pressure_string="";
+String mq135_string=""; 
+String vib_string="";
+String panic_string="";
+int humc=0;
+int hbv=0,pressurev=0,mq135v=0;
+int spo2v=0;
+char chr1,chr2,chr3,chr4,chr5,chr6,chr7,chr8,chr9,chr10;
+char chr11,chr12,chr13,chr14,chr15,chr16,chr17,chr18,chr19,chr20;
+char chr21,chr22,chr23,chr24,chr25,chr26,chr27,chr28,chr29,chr30,chr31;
+char chr32,chr33,chr34,chr35,chr36;
+char chr37,chr38,chr39,chr40,chr41;
+int sti=0;
+String inputString = "";         // a string to hold incoming data
+boolean stringComplete = false;  // whether the string is complete
+int sti1=0;
+String inputString1 = "";         // a string to hold incoming data
+boolean stringComplete1 = false;  // whether the string is complete
+void iot_send()
+{
+  finallat1="";
+finallong1="";
+//17.4332° , 078.6852°
+//finallat1 = String(finallat);
+//finallong1 = String(finallong);
+
+finallat1="17.4332";
+finallong1="078.6852";
+lcd.setCursor(15,1);lcd.print("U");
+     http.begin(servername + accountname + field1 + finallat1 + field2 + finallong1 + field3 + String(tempc) + field4 + String(humc) + field5 + String(hbv) + field6 + String(spo2v) + field7 + panic_string + field8 + vib_string);
+      httpResponseCode = http.GET();
+      if(httpResponseCode>0) 
+        {
+         payload="";
+         //Serial.print("HTTP Response code: ");
+         //Serial.println(httpResponseCode);
+         payload = http.getString();
+         //Serial.println(payload);
+        }
+      else 
+        {
+         ;
+         //Serial.print("Error code: ");
+         //Serial.println(httpResponseCode);
+        }
+     delay(8000); 
+       //lcd.setCursor(0,1);lcd.print("Emergency  ");
+     lcd.setCursor(15,1);lcd.print(" ");
+}         
+void serialFlush(){
+  while(Serial.available() > 0) {
+    char t = Serial.read();
+  }
+} 
+void beep()
+{
+  digitalWrite(buzzer, LOW);delay(2000);digitalWrite(buzzer, HIGH);
+}
+void setup() 
+{
+  Serial.begin(9600);
+//  while (!Serial);
+  Serial2.begin(9600, SERIAL_8N1, RXD2, TXD2);
+pinMode(buzzer, OUTPUT);
+digitalWrite(buzzer, HIGH);
+lcd.begin(16, 2);  
+  lcd.print("  Women Safety");
+  lcd.setCursor(0,1);
+  lcd.print("   Device");
+  delay(2500);
+WiFi.begin(ssid, password);
+  //Serial.println("Connecting");
+  while(WiFi.status() != WL_CONNECTED) 
+       {
+           delay(500);
+    //    Serial.print(".");
+       }
+  //Serial.println("");
+  //Serial.print("Connected to WiFi network with IP Address: ");
+  //Serial.println(WiFi.localIP());
+  delay(2000);
+  lcd.clear(); 
+  lcd.print("T:");//2-3-4,0
+  lcd.setCursor(5,0);
+  lcd.print("H:");//7-8-9,0 
+  lcd.setCursor(10,0);
+  lcd.print("H:");//12,0
+  lcd.setCursor(0,1);
+  lcd.print("S:");//2-3-4,1 
+  lcd.setCursor(5,1);
+  lcd.print("P:");//7-11-12,1
+  lcd.setCursor(10,1);
+  lcd.print("V:");//12,1
+}
+int ctm=0;
+String buttons="";
+int buttonv=0;
+int cntlmk=0;
+void loop () 
+{
+  While (Serial.available() > 0)
+       {
+        char chrt = (char)Serial.read();
+        if (chrt == '*')
+          {
+            sti1=1;
+          }
+        if(sti1 == 1)
+          {
+            inputString1 += chrt;
+          }
+        If (chrt == '#')
+          {sti1=0;
+              stringComplete1 = true;      
+          }
+        If (chrt == '@')
+          {
+            sti=1;
+          }
+        If (sti == 1)
+          {
+            inputString += chrt;
+          }
+        if(chrt == '$')
+          {sti=0;
+              stringComplete = true;      
+          }    
+       }
+if(stringComplete)
+     {
+chr2 = inputString [1];
+chr3 = inputString [2];
+chr4 = inputString [3];
+chr5 = inputString [4];
+chr6 = inputString [5];
+chr7 = inputString [6];
+chr8 = inputString [7];
+ chr9 = inputString [8];
+chr10 = inputString [9];
+chr11 = inputString [10];
+chr12 = inputString [11];
+chr13 = inputString [12];
+chr14 = inputString [13];
+chr15 = inputString [14];
+chr16 = inputString [15];
+finallat [0] = chr2;
+finallat [1] = chr3;
+finallat [2] = chr4;
+finallat [3] = chr5;
+finallat [4] = chr6;
+finallat [5] = chr7;
+finallat [6] = chr8;
+finallong [0] = chr9; 
+finallong [1] = chr10;
+finallong [2] = chr11;
+finallong [3] = chr12;
+finallong [4] = chr13;
+finallong [5] = chr14;
+finallong [6] = chr15;
+finallong [7] = chr16;
+finallat [7] = '\0';
+finallong [8] ='\0';
+lat_string = "";
+long_string = "";
+lat_string = String(finallat);
+long_string = String(finallong);
+sti = 0;
+      inputString = "";
+      stringComplete = false;
+      lcd.clear();       lcd.print(finallat);
+      lcd.setCursor(0,1);lcd.print(finallong);
+  delay (3000);
+  lcd.clear(); 
+  lcd.clear(); 
+  lcd.print("T:");//2-3-4,0
+  lcd.setCursor(5,0);
+  lcd.print("H:");//7-8-9,0 
+  lcd.setCursor(10,0);
+  lcd.print("H:");//12,0
+  lcd.setCursor(0,1);
+  lcd.print("S:");//2-3-4,1 
+  lcd.setCursor(5,1);
+  lcd.print("P:");//7-11-12,1
+  lcd.setCursor(10,1);
+  lcd.print("V:");//12,1
+     }  
+    if(stringComplete1)
+     {         
+      chr2 = inputString1[1];chr3 = inputString1[2];chr4 = inputString1[3];
+      chr5 = inputString1[4];chr6 = inputString1[5];chr7 = inputString1[6];
+      chr8 = inputString1[7];chr9 = inputString1[8];chr10 = inputString1[9];
+      chr11 = inputString1[10];chr12 = inputString1[11];chr13 = inputString1[12];
+      chr14 = inputString1[13];
+      chr15 = inputString1[14];
+       tempc  = ((chr2-48)*100) + ((chr3-48)*10) + (chr4-48);
+      humc = ((chr5-48)*100) + ((chr6-48)*10) + (chr7-48);
+      hbv = ((chr8-48)*100) + ((chr9-48)*10) + (chr10-48);
+      spo2v  = ((chr11-48)*100) + ((chr12-48)*10) + (chr13-48);
+       lcd.setCursor(2,0);convertl(tempc);
+        lcd.setCursor(7,0);convertl(humc);
+        lcd.setCursor(12,0);convertl(hbv);
+        lcd.setCursor(2,1);convertl(spo2v);
+        panic_string="";
+        if(chr14 == 'a'){lcd.setCursor(7,1);lcd.print("ON ");panic_string="ON";}
+        if(chr14 == 'b'){lcd.setCursor(7,1);lcd.print("OFF");panic_string="OFF";}
+        vib_string="";
+        if(chr15 == 'c'){lcd.setCursor(12,1);lcd.print("ON ");vib_string="ON";}
+        if(chr15 == 'd'){lcd.setCursor(12,1);lcd.print("OFF");vib_string="OFF";}
+      if(tempc > 40 || humc > 90 || chr14 == 'a' || chr15 == 'c')
+          {
+            beep();
+            iot_send();
+            serialFlush();
+          }
+      sti1 = 0;
+      inputString1 = "";
+      stringComplete1 = false;              
+cntlmk++;
+     } 
+if(cntlmk >= 30)
+     {cntlmk=0;
+         iot_send();
+         serialFlush();  
+     }
+}
+void converts(unsigned int value)
+{
+  unsigned int a,b,c,d,e,f,g,h;
+a=value/10000;
+      b=value%10000;
+      c=b/1000;
+      d=b%1000;
+      e=d/100;
+      f=d%100;
+      g=f/10;
+      h=f%10;
+     a=a|0x30;               
+      c=c|0x30;
+      e=e|0x30; 
+      g=g|0x30;              
+      h=h|0x30;
+   Serial.write(a);
+   Serial.write(c);
+   Serial.write(e); 
+   Serial.write(g);
+   Serial.write(h);
+}
+void convertl(unsigned int value)
+{
+  unsigned int a,b,c,d,e,f,g,h;
+      a=value/10000;
+      b=value%10000;
+      c=b/1000;
+      d=b%1000;
+      e=d/100;
+      f=d%100;		g=f/10;
+      h=f%10;	a=a|0x30;               
+      c=c|0x30;
+      e=e|0x30; 
+      g=g|0x30;              
+      h=h|0x30;
+//lcd.write(a);
+   lcd.write(c);
+   lcd.write(e); 
+   lcd.write(g);
+   lcd.write(h);
+}
